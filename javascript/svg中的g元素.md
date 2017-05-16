@@ -1,8 +1,4 @@
-# 在html中使用svg
-
-测试网站：[http://www.runoob.com/try/try.php?filename=tryhtml5_svg_ex](http://www.runoob.com/try/try.php?filename=tryhtml5_svg_ex)
-
-## g元素
+# g元素
 
 >The `<g>` SVG element is a container used to group other SVG elements. 
 >
