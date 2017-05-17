@@ -30,4 +30,8 @@ d3.json("miserables.json", function (err, graph) {
         .attr("cy", function (d, i) {
             return 4*i;
         });
+
+    nodes.append("title").text(function (d) {
+        return d.id;
+    })
 });
