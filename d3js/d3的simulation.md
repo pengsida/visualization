@@ -1,8 +1,5 @@
 # d3的simulation
-
 参考网站：[API网站](https://github.com/xswei/d3js_doc/tree/master/API/d3-force-master)
-
-<A HREF="#ROP_ARM">ROP_ARM</A>
 
 首先看例子：
 ```javascript
@@ -10,18 +7,36 @@ var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; })) //连线作用力
     .force("charge", d3.forceManyBody()) //节点间的作用力
     .force("center", d3.forceCenter(width / 2, height / 2)); //重力，布局有一个参考位置，不会跑偏
+
+simulation
+  .nodes(graph.nodes)
+  .on("tick", ticked);
+
+simulation.force("link")
+    .links(graph.links);
 ```
 
-## d3.forceSimulation([nodes])
+文档目录：
+
+* [d3.forceSimulation](#forceSimulation)
+* [simulation.force](#force)
+* [simulation.nodes](#nodes)
+* [simulation.on](#on)
+
+<h2 id="forceSimulation"> d3.forceSimulation([nodes])</h2>
 
 根据指定的节点数组创建一个没有作用力的仿真。
-如果没有指定nodes则默认为空数组。仿真会自动开始，可以通过simulation.on来为仿真的每一次tick添加事件监听器。
+如果没有指定nodes则默认为空数组。
+
+仿真会自动开始，可以通过simulation.on来为仿真的每一次tick添加事件监听器。
 也可以使用simulation.stop来停止仿真，simulation.tick来再次启用仿真。
 
-## simulation.force(name[, force])
+<h2 id="force"> simulation.force(name[, force])</h2>
 
 默认情况下，仿真是中的节点是没有力的作用的，需要通过这个方法为仿真系统设置力的作用，
 力有很多种，需要根据实际情况指定。
+
+If force is specified, assigns the force for the specified name and returns this simulation. If force is not specified, returns the force with the specified name, or undefined if there is no such force. 
 
 接下来介绍几个force函数：
 1. d3.forceLink([links])
@@ -188,4 +203,75 @@ var simulation = d3.forceSimulation()
 
 设置或获取center力的y坐标，默认为0
 
-<A NAME="ROP_ON_ARM">Davi L, Dmitrienko A, Sadeghi A R, et al. [Return-oriented programming without returns on ARM](http://www.trust.informatik.tu-darmstadt.de/fileadmin/user_upload/Group_TRUST/PubsPDF/ROP-without-Returns-on-ARM.pdf)[J]. System Security Lab-Ruhr University Bochum, Tech. Rep, 2010.</a>
+<h2 id="nodes"> simulation.nodes([nodes])</h2>
+
+首先看例子：
+```javascript
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; })) //连线作用力
+    .force("charge", d3.forceManyBody()) //节点间的作用力
+    .force("center", d3.forceCenter(width / 2, height / 2)); //重力，布局有一个参考位置，不会跑偏
+
+simulation
+  .nodes(graph.nodes)
+  .on("tick", ticked);
+```
+
+如果指定了nodes，则根据当前的nodes对象数组初始化仿真的节点初始位置和速度。
+如果没有指定nodes则根据指定的构造器返回节点对象数组。
+
+每个节点为一个对象类型，以下几个属性是通过仿真模拟器添加的：
+
+* index - 节点的索引
+* x - 节点当前的 x-位置
+* y - 节点当前的 y-位置
+* vx - 节点当前的 x-速度
+* vy - 节点当前的 y-速度
+
+位置 ⟨x,y⟩ 和速度 ⟨vx,vy⟩ 可能被随时修改. 如果 vx or vy 中的其中一个为NaN, 则速度会被初始化为 ⟨0,0⟩.
+如果 x 或 y 为 NaN, 则位置会根据phyllotaxis arrangement进行初始化，不再是随机的。
+
+如果要为某个节点设置默认的位置，则需要为该节点设置如下两个属性:
+
+* fx - x-位置
+* fy - y-位置
+
+在每次tick完成后，定义了node.fx的节点的node.x将被重置为node.fx，node.vx被设置为0. 
+同理node.y将被重置为node.fy，node.vy被设置为0. 
+在设置完时候node.fx 和 node.fy就被定义为null或移除这两个属性。
+
+如果节点数组中的元素发生改变，比如移除或添加一个节点。则需要重新调用这个方法。
+
+<h2 id="on">simulation.on(typenames, [listener])</h2>
+
+```javascript
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; })) //连线作用力
+    .force("charge", d3.forceManyBody()) //节点间的作用力
+    .force("center", d3.forceCenter(width / 2, height / 2)); //重力，布局有一个参考位置，不会跑偏
+
+simulation
+  .nodes(graph.nodes)
+  .on("tick", ticked);
+
+function ticked() {
+  link
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  node
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+}
+```
+
+设置或获取事件监听器。
+
+事件监听器通过type.names的形式指定，也就是同一种type可以根据name指定多个事件监听器。type有如下两种:
+
+* tick - 每次tick时调用.
+* end - 仿真结束时调用，也就是 alpha < alphaMin.
+
+tick事件不会由simulation.tick触发，仅仅可以通过内部计时器触发。
