@@ -35,7 +35,7 @@ d3.json("miserables.json", function (err, graph) {
 
     nodes.call(d3.drag()
         .on("start", drag_start)
-        .on("drag", draging)
+        .on("drag", dragging)
         .on("end", drag_end)
     );
 
@@ -76,7 +76,7 @@ function drag_start(d) {
     d.fy = d.y;
 }
 
-function draging(d) {
+function dragging(d) {
     d.fx = d3.event.x;
     d.fy = d3.event.y;
 }

@@ -238,6 +238,32 @@
 </script>
 
 <script>
+    /////////////////////////////
+    //                         //
+    //      与拖拽相关的函数     //
+    //                         //
+    /////////////////////////////
+
+    var isDragging = 0;
+
+    function drag_start() {
+        p1.innerHTML = "fuck_start";
+        isDragging = 1;
+    }
+
+    function dragging() {
+        if (isDragging)
+            p2.innerHTML = "fucking";
+    }
+
+    function drag_end() {
+        p1.innerHTML = "fuck_end";
+        p2.innerHTML = "";
+        isDragging = 0;
+    }
+</script>
+
+<script>
     var svg = document.getElementById("svg");
     var nodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
     var links = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -259,5 +285,9 @@
     drawLine(node2, node3);
     drawLine(node3, node4);
 
-    setInterval(forceDirectedAlgorithm, 20);
+//    setInterval(forceDirectedAlgorithm, 20);
+
+    document.onmousedown = drag_start;
+    document.onmousemove = dragging;
+    document.onmouseup = drag_end;
 </script>
