@@ -3,17 +3,17 @@
  */
 
 var svg = d3.select("svg");
-var width = svg.attr("width"), height = svg.attr("height");
 var color = d3.scaleOrdinal(d3.schemeCategory20);
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function (d) {
-        return d.id;
-    }))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width/2, height/2));
+
+var simulation = d3.forceSimulation();
+simulation.force("link", d3.forceLink().id(function (d) {
+    return d.id;
+}));
+simulation.force("charge", d3.forceManyBody());
+simulation.force("center", d3.forceCenter(svg.attr("width")/2, svg.attr("height")/2));
 
 d3.json("miserables.json", function (err, graph) {
-    if (err)
+    if(err)
         throw err;
 
     var lines = svg.append("g").attr("class", "links")
@@ -27,13 +27,17 @@ d3.json("miserables.json", function (err, graph) {
         .attr("r", 5)
         .attr("fill", function (d) {
             return color(d.group);
-        })
-        .attr("cx", function (d, i) {
-            return 5*i;
-        })
-        .attr("cy", function (d, i) {
-            return 5*i;
         });
+
+    nodes.append("title").text(function (d) {
+        return d.id;
+    });
+
+    nodes.call(d3.drag()
+        .on("start", drag_start)
+        .on("drag", draging)
+        .on("end", drag_end)
+    );
 
     simulation.nodes(graph.nodes);
     simulation.on("tick", ticked);
@@ -63,3 +67,24 @@ d3.json("miserables.json", function (err, graph) {
             });
     }
 });
+
+function drag_start(d) {
+    if (!d3.event.active)
+        simulation.alphaTarget(0.3).restart();
+
+    d.fx = d.x;
+    d.fy = d.y;
+}
+
+function draging(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+}
+
+function drag_end(d) {
+    if (!d3.event.active)
+        simulation.alphaTarget(0);
+
+    d.fx = null;
+    d.fy = null;
+}

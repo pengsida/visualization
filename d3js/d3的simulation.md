@@ -22,6 +22,8 @@ simulation.force("link")
 * [simulation.force](#force)
 * [simulation.nodes](#nodes)
 * [simulation.on](#on)
+* [simulation.alpha](#alpha)
+* [simulation.restart](#restart)
 
 <h2 id="forceSimulation"> d3.forceSimulation([nodes])</h2>
 
@@ -51,11 +53,16 @@ If force is specified, assigns the force for the specified name and returns this
 ```javascript
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; })); //连线作用力
+
+simulation.force("link")
+    .links(graph.links);
 ```
 
 #### link.links([links])
 
-设置或获取link作用力的连接数组并重新计算distance 和 strength. 如果没有指定links则返回当前的links数组，默认为空.
+如果有给出links数组，就将links数组与force()函数联系起来，并且为links数组中的每一个link重新计算distance和strength参数，然后返回force。
+
+If links is specified, sets the array of links associated with this force, recomputes the distance and strength parameters for each link, and returns this force. If links is not specified, returns the current array of links, which defaults to the empty array.
 
 每个link都是包含以下两个属性的对象:
 
@@ -65,7 +72,7 @@ var simulation = d3.forceSimulation()
 
 为方便起见，每个连接的源和目的可以是数字索引或者字符串标示符。参考link.id.
 
-如果links数组发生了改变，比如添加或删除一个link时则必须重新调用这个方法
+If the specified array of links is modified, such as when links are added to or removed from the simulation, this method must be called again with the new (or changed) array to notify the force of the change; the force does not make a defensive copy of the specified array.
 
 #### link.id([id])
 
@@ -203,7 +210,7 @@ var simulation = d3.forceSimulation()
 
 设置或获取center力的y坐标，默认为0
 
-<h2 id="nodes"> simulation.nodes([nodes])</h2>
+<h2 id="nodes">simulation.nodes([nodes])</h2>
 
 首先看例子：
 ```javascript
@@ -229,6 +236,7 @@ simulation
 * vy - 节点当前的 y-速度
 
 位置 ⟨x,y⟩ 和速度 ⟨vx,vy⟩ 可能被随时修改. 如果 vx or vy 中的其中一个为NaN, 则速度会被初始化为 ⟨0,0⟩.
+
 如果 x 或 y 为 NaN, 则位置会根据phyllotaxis arrangement进行初始化，不再是随机的。
 
 如果要为某个节点设置默认的位置，则需要为该节点设置如下两个属性:
@@ -237,6 +245,7 @@ simulation
 * fy - y-位置
 
 在每次tick完成后，定义了node.fx的节点的node.x将被重置为node.fx，node.vx被设置为0. 
+
 同理node.y将被重置为node.fy，node.vy被设置为0. 
 在设置完时候node.fx 和 node.fy就被定义为null或移除这两个属性。
 
@@ -275,3 +284,28 @@ function ticked() {
 * end - 仿真结束时调用，也就是 alpha < alphaMin.
 
 tick事件不会由simulation.tick触发，仅仅可以通过内部计时器触发。
+
+<h2 id="alpha">simulation.alpha([alpha])</h2>
+
+设定动画的冷却系数，运动过程中该系数会不断减小，直到等于0为止，此时动画也停止了。
+
+## simulation.alphaTarget([target])
+
+If target is specified, sets the current target alpha to the specified number in the range [0,1] and returns this simulation. If target is not specified, returns the current target alpha value, which defaults to 0.
+
+<h2 id="restart">simulation.restart()</h2>
+
+重启simulation的定时器，并返回simulation。
+
+Restarts the simulation’s internal timer and returns the simulation. In conjunction with simulation.alphaTarget or simulation.alpha, this method can be used to “reheat” the simulation during interaction, such as when dragging a node, or to resume the simulation after temporarily pausing it with simulation.stop.
+
+例子如下：
+```javascript
+function dragstarted(d) {
+  if (!d3.event.active) 
+    simulation.alphaTarget(0.3).restart();
+    
+  d.fx = d.x;
+  d.fy = d.y;
+}
+```

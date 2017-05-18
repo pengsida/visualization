@@ -1,6 +1,11 @@
 # d3的选择器
 
-## 如何选择元素
+文档目录：
+
+* [选择元素和绑定数据](#select)
+* [selection.call](#call)
+
+<h2 id="select">如何选择元素</h2>
 
 在 D3 中，用于选择元素的函数有两个：
 
@@ -86,3 +91,29 @@ I like cats
 
 I like snakes
 ```
+
+<h2 id="call">selection.call(function[, arguments…])</h2>
+
+调用相应的function，同时传入selection和可选的arguments。
+该函数结束后返回selection。
+
+Invokes the specified function exactly once, passing in this selection along with any optional arguments. Returns this selection. This is equivalent to invoking the function by hand but facilitates method chaining. For example, to set several styles in a reusable function:
+
+```javascript
+function name(selection, first, last) {
+  selection
+      .attr("first-name", first)
+      .attr("last-name", last);
+}
+```
+
+Now say:
+```javascript
+d3.selectAll("div").call(name, "John", "Snow");
+```
+This is roughly equivalent to:
+```javascript
+name(d3.selectAll("div"), "John", "Snow");
+```
+
+The only difference is that selection.call always returns the selection and not the return value of the called function, name.
