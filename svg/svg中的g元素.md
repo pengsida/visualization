@@ -1,5 +1,7 @@
 # g元素
 
+svg中的`<g>`元素用来组织svg元素。如果一组svg元素被g元素包裹了，你可以通过对g元素进行变换（transform），被g元素包裹的元素也将被变换。
+
 >The `<g>` SVG element is a container used to group other SVG elements. 
 >
 >Transformations applied to the `<g>` element are performed on all of its child elements, and any of its attributes are inherited by its child elements. 
