@@ -125,6 +125,26 @@ var links = [
 
 当link作用力初始化的时候id访问器都会在每个节点上调用。
 
+#### link.source([source])
+
+If source is specified, sets the source accessor to the specified function and returns this link generator. 
+If source is not specified, returns the current source accessor, which defaults to:
+```javascript
+function source(d) {
+  return d.source;
+}
+```
+
+#### link.target([target])
+
+If target is specified, sets the target accessor to the specified function and returns this link generator. 
+If target is not specified, returns the current target accessor, which defaults to:
+```javascript
+function target(d) {
+  return d.target;
+}
+```
+
 #### link.distance([distance])
 
 设置或获取两个节点之间的距离，默认为:

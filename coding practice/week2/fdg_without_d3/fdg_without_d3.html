@@ -277,7 +277,7 @@
 
     function drag_start(event) {
         isDragging = 1;
-        if (runTimes <= 0)
+        if (forceDirect === null)
         {
             runTimes = RUNTIMES;
             forceDirect = setInterval(forceDirectedAlgorithm, 20);
