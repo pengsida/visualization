@@ -37,6 +37,8 @@
     var nodeNum = 0;
     var lineNum = 0;
     var linksHash = {};
+    var RUNTIMES = 200;
+    var runTimes = RUNTIMES;
 
 </script>
 
@@ -84,6 +86,38 @@
         line.setAttribute("x2", node2.getAttribute("cx"));
         line.setAttribute("y2", node2.getAttribute("cy"));
         links.appendChild(line);
+    }
+    
+    function updateNode(node, x, y) {
+        node.setAttribute("cx", String(x));
+        node.setAttribute("cy", String(y));
+    }
+
+    function updateLine(node) {
+        var childNodes = node.parentNode.childNodes;
+        var i;
+        var num1, num2;
+        var line, lineId;
+
+        num1 = getNodeNum(node);
+
+        for (i = 0; i < childNodes.length; i++)
+        {
+            if (childNodes[i] === node)
+                continue;
+
+            num2 = getNodeNum(childNodes[i]);
+            lineId = linksHash[String(num1)+String(num2)];
+
+            if (typeof(lineId) === "undefined")
+                continue;
+
+            line = document.getElementById(lineId);
+            line.setAttribute("x1", node.getAttribute("cx"));
+            line.setAttribute("y1", node.getAttribute("cy"));
+            line.setAttribute("x2", childNodes[i].getAttribute("cx"));
+            line.setAttribute("y2", childNodes[i].getAttribute("cy"));
+        }
     }
 
 </script>
@@ -167,7 +201,6 @@
         var realY = new Array(childNodes.length);
         var num1, num2;
         var line;
-        var link;
 
         for (i = 0; i < childNodes.length; i++)
         {
@@ -208,31 +241,16 @@
         }
 
         for (i = 0; i < childNodes.length; i++)
-        {
-            childNodes[i].setAttribute("cx", String(realX[i]));
-            childNodes[i].setAttribute("cy", String(realY[i]));
-        }
+            updateNode(childNodes[i], realX[i], realY[i]);
 
         for (i = 0; i < childNodes.length; i++)
+            updateLine(childNodes[i]);
+
+        runTimes--;
+        if (runTimes <= 0)
         {
-            num1 = getNodeNum(childNodes[i]);
-            for (j = childNodes.length-1; j > i; j--)
-            {
-                num2 = getNodeNum(childNodes[j]);
-                line = linksHash[String(num1)+String(num2)];
-
-                if (typeof(line) === "undefined")
-                    continue;
-
-                p1.innerHTML = line;
-
-                link = document.getElementById(line);
-
-                link.setAttribute("x1", childNodes[i].getAttribute("cx"));
-                link.setAttribute("y1", childNodes[i].getAttribute("cy"));
-                link.setAttribute("x2", childNodes[j].getAttribute("cx"));
-                link.setAttribute("y2", childNodes[j].getAttribute("cy"));
-            }
+            clearInterval(forceDirect);
+            forceDirect = null;
         }
     }
 </script>
@@ -246,27 +264,67 @@
 
     var isDragging = 0;
 
-    function drag_start() {
-        p1.innerHTML = "fuck_start";
+    function getMouseXY(event) {
+        var x, y;
+        event = event || window.event;
+
+        if (event.pageX)
+        {
+            x = event.pageX;
+            y = event.pageY;
+        }
+        else
+        {
+            x = event.clientX - document.body.clientLeft + document.body.scrollLeft;
+            y = event.clientY - document.body.clientTop + document.body.scrollTop;
+        }
+
+        return {x: x, y: y};
+    }
+
+    function getParentXY() {
+        var offsetLeft = svg.offsetLeft;
+        var offsetTop = svg.offsetTop;
+
+        return {x: offsetLeft, y: offsetTop};
+    }
+
+    function drag_start(event) {
         isDragging = 1;
+        if (runTimes <= 0)
+        {
+            runTimes = RUNTIMES;
+            forceDirect = setInterval(forceDirectedAlgorithm, 20);
+        }
     }
 
-    function dragging() {
+    function dragging(event) {
+        var mouseXY;
+        var parentXY;
+        var nodeXY = {};
+        var node = event.target;
+
         if (isDragging)
-            p2.innerHTML = "fucking";
+        {
+            runTimes = RUNTIMES;
+            mouseXY = getMouseXY(event);
+            parentXY = getParentXY();
+            nodeXY.x = mouseXY.x - parentXY.x;
+            nodeXY.y = mouseXY.y - parentXY.y;
+            updateNode(node, nodeXY.x, nodeXY.y);
+            updateLine(node);
+        }
     }
 
-    function drag_end() {
-        p1.innerHTML = "fuck_end";
-        p2.innerHTML = "";
+    function drag_end(event) {
         isDragging = 0;
     }
 </script>
 
 <script>
-    var svg = document.getElementById("svg");
     var nodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
     var links = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    var forceDirect;
 
     nodes.setAttribute("class", "nodes");
     nodes.setAttribute("id", "nodes");
@@ -285,9 +343,12 @@
     drawLine(node2, node3);
     drawLine(node3, node4);
 
-//    setInterval(forceDirectedAlgorithm, 20);
+    forceDirect = setInterval(forceDirectedAlgorithm, 20);
 
     document.onmousedown = drag_start;
-    document.onmousemove = dragging;
+    node1.onmousemove = dragging;
+    node2.onmousemove = dragging;
+    node3.onmousemove = dragging;
+    node4.onmousemove = dragging;
     document.onmouseup = drag_end;
 </script>

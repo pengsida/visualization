@@ -1,5 +1,11 @@
 # javascript中的鼠标事件
 
+## event.target
+
+event.target是触发事件的元素。
+
+## javascript中的鼠标事件
+
 这里通过实现简单的拖拽来讲述javascript中的鼠标事件。
 
 ## 使用 JavaScript 实现拖拽的步骤
@@ -42,7 +48,13 @@ document.onmouseup = up;
 
 - pageX / pageY : 相对 document 对象坐标
 
-一般鼠标的位置使用 pageX / pageY 获取，但是 IE 不支持这两个属性。所以在 IE 中使用 event.clientX + document.body.scrollLeft - document.body.clientLeft; 获取鼠标的位置。
+一般鼠标的位置使用 pageX / pageY 获取，但是 IE 不支持这两个属性。所以在 IE 中使用
+`event.clientX + document.body.scrollLeft - document.body.clientLeft; `获取鼠标的位置。
+
+其中
+
+* `Element.scrollLeft` property gets or sets the number of pixels that an element's content is scrolled to the left.
+* `Element.clientLeft` 是一个元素左边界的宽度。
 
 获取鼠标位置的函数：
 
