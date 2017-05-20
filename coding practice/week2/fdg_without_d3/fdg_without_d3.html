@@ -37,7 +37,6 @@
 
 </script>
 
-
 <script>
     /////////////////////////////
     //                         //
@@ -55,7 +54,7 @@
 
         nodeNum++;
         node.setAttribute("id", "node"+nodeNum);
-        node.setAttribute("r", "5");
+        node.setAttribute("r", "20");
         node.setAttribute("fill", "black");
         node.setAttribute("cx", String(x));
         node.setAttribute("cy", String(y));
@@ -269,10 +268,10 @@
     }
 
     function getParentXY() {
-        var offsetLeft = svg.offsetLeft;
-        var offsetTop = svg.offsetTop;
+//        var offsetLeft = svg.offsetLeft;
+//        var offsetTop = svg.offsetTop;
 
-        return {x: offsetLeft, y: offsetTop};
+        return {x: 0, y: 0};
     }
 
     function drag_start(event) {
