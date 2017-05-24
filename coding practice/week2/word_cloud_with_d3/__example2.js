@@ -218,7 +218,7 @@ form.on("button", function () {
     parseText(d3.select("#text").property("value"));
 });
 
-function fuck() {
+function generate() {
     parseText(d3.select("#text").property("value"));
 }
 
@@ -284,6 +284,10 @@ function draw(words, extent) {
     var temp = d3.select("svg");
     if (temp !== null)
         temp.remove();
+    if (d3.select("#width").property("value") !== "")
+        width = d3.select("#width").property("value");
+    if (d3.select("#height").property("value") !== "")
+        height = d3.select("#height").property("value");
     var scale;
     var svg = d3.select("#vis").append("svg");
     var g = svg.append("g");
