@@ -43,6 +43,22 @@ for (x in person)
 }
 ```
 
+## forEach
+
+```javascript
+<script>  
+var arryAll = [];  
+arryAll.push(1);  
+arryAll.push(2);  
+arryAll.push(3);  
+arryAll.push(4);  
+  
+arryAll.forEach(function(e){  
+    alert(e);  
+});
+</script>
+```
+
 ## while 循环
 
 While 循环会在指定条件为真时循环执行代码块。

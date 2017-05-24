@@ -46,6 +46,8 @@ function draw(words) {
         return d.size + "px";
     });
 
+    text.attr("text-anchor", "middle");
+
     text.attr("transform", function (d) {
         return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
     });

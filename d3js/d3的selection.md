@@ -4,6 +4,7 @@
 
 * [选择元素和绑定数据](#select)
 * [selection.call](#call)
+* [selection.transition](#transition)
 
 <h2 id="select">如何选择元素</h2>
 
@@ -117,3 +118,22 @@ name(d3.selectAll("div"), "John", "Snow");
 ```
 
 The only difference is that selection.call always returns the selection and not the return value of the called function, name.
+
+<h2 id="transition">selection.transition([name])</h2>
+
+Returns a new transition on the given selection with the specified name. If a name is not specified, null is used. The new transition is only exclusive with other transitions of the same name.
+
+If the name is a transition instance, the returned transition has the same id and name as the specified transition. If a transition with the same id already exists on a selected element, the existing transition is returned for that element. Otherwise, the timing of the returned transition is inherited from the existing transition of the same id on the nearest ancestor of each selected element. Thus, this method can be used to synchronize a transition across multiple selections, or to re-select a transition for specific elements and modify its configuration. For example:
+```javascript
+var t = d3.transition()
+    .duration(750)
+    .ease(d3.easeLinear);
+
+d3.selectAll(".apple").transition(t)
+    .style("fill", "red");
+
+d3.selectAll(".orange").transition(t)
+    .style("fill", "orange");
+```
+
+If the specified transition is not found on a selected node or its ancestors (such as if the transition already ended), the default timing parameters are used; however, in a future release, this will likely be changed to throw an error. 
