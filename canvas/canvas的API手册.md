@@ -1,6 +1,6 @@
 # html中的canvas元素
 
-参考网站为：[http://www.w3school.com.cn/tags/html_ref_canvas.asp](http://www.w3school.com.cn/tags/html_ref_canvas.asp)
+API手册网址为：[http://www.w3school.com.cn/tags/html_ref_canvas.asp](http://www.w3school.com.cn/tags/html_ref_canvas.asp)
 
 ## 获得canvas对象
 
