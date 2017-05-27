@@ -33,7 +33,7 @@ var data = [
         'height': height,
       });
 
-    var area = d3.svg.area()
+    var area = d3.area()
         .x(function(d) { return d.x; })
         .y0(0)
         .y1(function(d) { return d.y; });
@@ -63,13 +63,13 @@ var area = d3.svg.area()
 
 ```javascript
 //對照組
-var area1 = d3.svg.area()
+var area1 = d3.area()
     .x(function(d) { return d.x; })
     .y0(0)
     .y1(function(d) { return d.y; });
 
 //實驗組
-var area2 = d3.svg.area()
+var area2 = d3.area()
     .x(function(d) { return d.x; })
     .y0(0)
     .y1(function(d) { return d.y; })
