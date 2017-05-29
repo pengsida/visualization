@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<svg width="900" height="300"></svg>
+<div>
+    <button onclick="sortBar()">排序</button>
+    <br/>
+    <label for="delete">输入所要删除柱状体的序号：</label><input type="text" id="delete">
+    <button onclick="deleteBar()">删除数据</button>
+    <br/>
+    <label for="delete">输入所要增加柱状体的数值：</label><input type="text" id="insert">
+    <button onclick="insertBar()">添加数据</button>
+</div>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+    var dataset = [43, 50, 87, 99, 120, 142, 167, 82, 40, 98];
+    dataset = dataset.map(function (d, i) {
+        return {id: i, num: d};
+    });
+
+    var svg = d3.select("svg"),
+        bar = svg.selectAll("rect")
+            .data(dataset, function (d) {
+                return d.id;
+            })
+            .enter()
+            .append("rect"),
+        barText = svg.selectAll("text")
+            .data(dataset, function (d) {
+                return d.id;
+            })
+            .enter()
+            .append("text"),
+        WIDTH = 40,
+        svgHeight = svg.attr("height"),
+        linear = d3.scaleLinear()
+            .domain([0, d3.max(dataset, function (d) {
+                return d.num;
+            })])
+            .range([0, svgHeight]),
+        BLANK = 8,
+        COLOR = d3.scaleOrdinal(d3.schemeCategory20),
+        barX = function (d, i) {
+            return (WIDTH+BLANK) * i;
+        },
+        barY = function (d) {
+            return svgHeight - linear(d.num);
+        },
+        barFill = function (d, i) {
+            return COLOR(i);
+        },
+        barHeight = function (d) {
+            return linear(d.num);
+        },
+        barTextX = function (d, i) {
+            return (WIDTH+BLANK) * i + WIDTH/2;
+        },
+        barTextY = function (d) {
+            return svgHeight - linear(d.num);
+        },
+        barTextText = function (d) {
+            return d.num;
+        };
+
+    bar.attr("x", barX)
+        .attr("y", barY)
+        .attr("width", WIDTH)
+        .attr("height", barHeight)
+        .attr("fill", barFill);
+
+    barText.attr("x", barTextX)
+        .attr("y", barTextY)
+        .attr("dy", "20px")
+        .attr("text-anchor", "middle")
+        .attr("font-size", 15)
+        .attr("fill", "black")
+        .text(barTextText);
+
+    function updateBar() {
+        var barUpdate,
+            barTextUpdate;
+
+        barUpdate = svg.selectAll("rect")
+            .data(dataset, function (d) {
+                return d.id;
+            });
+        barTextUpdate = svg.selectAll("text")
+            .data(dataset, function (d) {
+                return d.id;
+            });
+
+        barUpdate
+            .transition()
+            .duration(2500)
+            .attr("y", barY)
+            .attr("height", barHeight);
+        barTextUpdate
+            .transition()
+            .duration(2500)
+            .attr("y", barTextY);
+    }
+
+    function insert(dataset, data) {
+        var i,
+            length = dataset.length;
+
+        for (i = 0; i < length; i++){
+            if (i === dataset[i].id)
+                continue;
+
+            dataset.splice(i, 0, {id: i, num: data});
+            return;
+        }
+
+        dataset.splice(i, 0, {id: i, num: data});
+    }
+
+    function sortBar() {
+        var barEnter,
+            barTextEnter;
+
+        dataset.sort(function (d1, d2) {
+            return d1.num - d2.num;
+        });
+
+        dataset = dataset.map(function (d, i) {
+            return {id: i, num: d.num};
+        });
+
+        svg.selectAll("rect")
+            .transition()
+            .duration(2000)
+            .attr("y", svgHeight)
+            .attr("height", 0)
+            .style("opacity", 0)
+            .remove();
+
+        svg.selectAll("text")
+            .transition()
+            .duration(2000)
+            .attr("y", svgHeight)
+            .style("opacity", 0)
+            .remove();
+
+        setTimeout(function () {
+            barEnter = svg.selectAll("rect").data(dataset, function (d) {
+                return d.id;
+            })
+                .enter()
+                .append("rect");
+            barTextEnter = svg.selectAll("text").data(dataset, function (d) {
+                return d.id;
+            })
+                .enter()
+                .append("text");
+
+            barEnter
+                .attr("x", barX)
+                .attr("y", svgHeight)
+                .style("opacity", 0)
+                .transition()
+                .duration(2500)
+                .attr("y", barY)
+                .attr("width", WIDTH)
+                .attr("height", barHeight)
+                .attr("fill", barFill)
+                .style("opacity", 1);
+
+            barTextEnter
+                .attr("x", barTextX)
+                .attr("y", svgHeight)
+                .style("opacity", 0)
+                .transition()
+                .duration(2500)
+                .attr("x", barTextX)
+                .attr("y", barTextY)
+                .attr("dy", "20px")
+                .attr("text-anchor", "middle")
+                .attr("font-size", 15)
+                .attr("fill", "black")
+                .style("opacity", 1)
+                .text(barTextText);
+        }, 2100);
+    }
+    
+    function deleteBar() {
+        var deleteData = d3.select("#delete").property("value"),
+            barExit,
+            barTextExit;
+
+        if (deleteData === ""){
+            alert("需要输入所要删除柱状体的序号");
+            return;
+        }
+        dataset.splice(+deleteData, 1);
+        linear = d3.scaleLinear()
+            .domain([0, d3.max(dataset, function (d) {
+                return d.num;
+            })])
+            .range([0, svgHeight]);
+
+        updateBar();
+
+        barExit = svg.selectAll("rect").data(dataset, function (d) {
+            return d.id;
+        }).exit();
+        barTextExit = svg.selectAll("text").data(dataset, function (d) {
+            return d.id;
+        }).exit();
+
+        barExit
+            .transition()
+            .duration(2500)
+            .attr("y", svgHeight)
+            .style("opacity", 0)
+            .remove();
+
+        barTextExit
+            .transition()
+            .duration(2500)
+            .attr("y", svgHeight)
+            .style("opacity", 0)
+            .remove();
+    }
+    
+    function insertBar() {
+        var insertData = d3.select("#insert").property("value"),
+            barEnter,
+            barTextEnter;
+
+        if (insertData === ""){
+            alert("需要输入所要增加柱状体的数值");
+            return;
+        }
+        insert(dataset, +insertData);
+        linear = d3.scaleLinear()
+            .domain([0, d3.max(dataset, function (d) {
+                return d.num;
+            })])
+            .range([0, svgHeight]);
+
+        updateBar();
+
+        barEnter = svg.selectAll("rect").data(dataset, function (d) {
+            return d.id;
+        }).enter().append("rect");
+        barTextEnter = svg.selectAll("text").data(dataset, function (d) {
+            return d.id;
+        }).enter().append("text");
+
+        barEnter
+            .attr("x", barX)
+            .attr("y", svgHeight)
+            .transition()
+            .duration(2500)
+            .attr("y", barY)
+            .attr("width", WIDTH)
+            .attr("height", barHeight)
+            .attr("fill", barFill);
+
+        barTextEnter
+            .attr("x", barTextX)
+            .attr("y", svgHeight)
+            .attr("opacity", 0)
+            .attr("text-anchor", "middle")
+            .attr("dy", "20px")
+            .transition()
+            .duration(2500)
+            .attr("y", barTextY)
+            .text(barTextText)
+            .style("opacity", 1);
+    }
+</script>
