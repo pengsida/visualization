@@ -64,16 +64,26 @@
         };
 
     bar.attr("x", barX)
+        .attr("y", svgHeight)
+        .style("opacity", 0)
+        .attr("fill", barFill)
+        .transition()
+        .duration(2500)
         .attr("y", barY)
         .attr("width", WIDTH)
         .attr("height", barHeight)
-        .attr("fill", barFill);
+        .style("opacity", 1);
 
     barText.attr("x", barTextX)
-        .attr("y", barTextY)
+        .attr("y", svgHeight)
         .attr("dy", "20px")
         .attr("text-anchor", "middle")
         .attr("font-size", 15)
+        .style("opacity", 0)
+        .transition()
+        .duration(2500)
+        .attr("y", barTextY)
+        .style("opacity", 1)
         .attr("fill", "black")
         .text(barTextText);
 
@@ -130,7 +140,7 @@
 
         svg.selectAll("rect")
             .transition()
-            .duration(2000)
+            .duration(1500)
             .attr("y", svgHeight)
             .attr("height", 0)
             .style("opacity", 0)
@@ -138,7 +148,7 @@
 
         svg.selectAll("text")
             .transition()
-            .duration(2000)
+            .duration(1500)
             .attr("y", svgHeight)
             .style("opacity", 0)
             .remove();
@@ -160,7 +170,7 @@
                 .attr("y", svgHeight)
                 .style("opacity", 0)
                 .transition()
-                .duration(2500)
+                .duration(1500)
                 .attr("y", barY)
                 .attr("width", WIDTH)
                 .attr("height", barHeight)
@@ -172,7 +182,7 @@
                 .attr("y", svgHeight)
                 .style("opacity", 0)
                 .transition()
-                .duration(2500)
+                .duration(1500)
                 .attr("x", barTextX)
                 .attr("y", barTextY)
                 .attr("dy", "20px")
@@ -181,7 +191,7 @@
                 .attr("fill", "black")
                 .style("opacity", 1)
                 .text(barTextText);
-        }, 2100);
+        }, 1600);
     }
     
     function deleteBar() {
@@ -211,14 +221,14 @@
 
         barExit
             .transition()
-            .duration(2500)
+            .duration(1500)
             .attr("y", svgHeight)
             .style("opacity", 0)
             .remove();
 
         barTextExit
             .transition()
-            .duration(2500)
+            .duration(1500)
             .attr("y", svgHeight)
             .style("opacity", 0)
             .remove();
@@ -253,7 +263,7 @@
             .attr("x", barX)
             .attr("y", svgHeight)
             .transition()
-            .duration(2500)
+            .duration(1500)
             .attr("y", barY)
             .attr("width", WIDTH)
             .attr("height", barHeight)
@@ -266,7 +276,7 @@
             .attr("text-anchor", "middle")
             .attr("dy", "20px")
             .transition()
-            .duration(2500)
+            .duration(1500)
             .attr("y", barTextY)
             .text(barTextText)
             .style("opacity", 1);
