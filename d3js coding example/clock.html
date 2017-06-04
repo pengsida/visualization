@@ -1,10 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<meta charset="utf-8">
+<style>
+    circle {
+        stroke: black;
+        stroke-opacity: 1;
+        fill: none;
+    }
+
+    line {
+        stroke: black;
+        stroke-width: 1px;
+    }
+</style>
+
+<svg width="500" height="500"></svg>
+
+<script src="d3.v4.min.js"></script>
+<script>
+    /*
+        画一个时钟
+        1. 先画一个圆
+        2. 再画秒针、分针、时针
+            - 通过new Date()获得时间
+            - 每一个刻度对应的角度为alpha = 2*Math.PI/60
+            - 获得秒数seconds，从而知道秒针所指的位置，x = sin(seconds*alpha), y = -cos(seconds*alpha)
+        3. 再画刻度
+            - 根据每一个刻度对应的角度算出刻度所在的位置，x = sin(seconds*alpha), y = -cos(seconds*alpha)
+     */
+    (function () {
+        var svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height"),
+            radius = 100,
+            g = svg.append("g")
+                .attr("transform", "translate(" + [width/2, height/2] + ")"),
+            marks = d3.range(60),
+            alpha = 2*Math.PI/60.0,
+            secondLength = radius - 5,
+            minuteLength = 0.618*secondLength,
+            hourLength = 0.382*secondLength,
+            second = g.append("line")
+                .attr("x0", 0)
+                .attr("y0", 0)
+                .attr("x1", secondLength*Math.sin((+new Date().getSeconds())*alpha))
+                .attr("y1", -secondLength*Math.cos((+new Date().getSeconds())*alpha)),
+            minute = g.append("line")
+                .attr("x0", 0)
+                .attr("y0", 0)
+                .attr("x1", minuteLength*Math.sin((+new Date().getMinutes())*alpha))
+                .attr("y1", -minuteLength*Math.cos((+new Date().getMinutes())*alpha)),
+            hour = g.append("line")
+                .attr("x0", 0)
+                .attr("y0", 0)
+                .attr("x1", hourLength*Math.sin((+new Date().getHours())*alpha))
+                .attr("y1", -hourLength*Math.cos((+new Date().getHours())*alpha));
+
+        g.append("circle")
+            .attr("r", radius);
+
+        marks = marks.map(function (d) {
+            return d * alpha;
+        });
+
+        svg.append("g")
+            .attr("transform", "translate(" + [width/2, height/2] + ")")
+            .selectAll("line")
+            .data(marks)
+            .enter()
+            .append("line")
+            .attr("x1", function (d, i) {
+                if (i % 5 === 0)
+                    return (radius-6)*Math.sin(d);
+                else
+                    return (radius-3)*Math.sin(d);
+            })
+            .attr("y1", function (d, i) {
+                if (i % 5 === 0)
+                    return -(radius-5)*Math.cos(d);
+                else
+                    return -(radius-3)*Math.cos(d);
+            })
+            .attr("x2", function (d) {
+                return radius * Math.sin(d);
+            })
+            .attr("y2", function (d) {
+                return -radius * Math.cos(d);
+            });
+
+        setInterval(function () {
+            var seconds = +new Date().getSeconds(),
+                minutes = +new Date().getMinutes(),
+                hours = +new Date().getHours();
+
+            second.attr("x1", secondLength*Math.sin(seconds*alpha))
+                .attr("y1", -secondLength*Math.cos(seconds*alpha));
+            minute.attr("x1", minuteLength*Math.sin(minutes*alpha))
+                .attr("y1", -minuteLength*Math.cos(minutes*alpha));
+            hour.attr("x1", hourLength*Math.sin(hours*alpha))
+                .attr("y1", -hourLength*Math.cos(hours*alpha));
+        }, 1000)
+    })();
+</script>
